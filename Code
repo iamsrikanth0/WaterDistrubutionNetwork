@@ -1,0 +1,115 @@
+import java.util.*;
+
+// Class to represent an area in Hyderabad
+class Area {
+    String name;
+
+    public Area(String name) {
+        this.name = name;
+    }
+}
+
+// Class to represent an edge between two areas
+class Edge {
+    Area src, dest;
+    int weight;
+
+    public Edge(Area src, Area dest, int weight) {
+        this.src = src;
+        this.dest = dest;
+        this.weight = weight;
+    }
+}
+
+// Class to represent a water distribution network using Graphs
+class HyderabadWaterNetwork {
+    List<Area> areas;
+    List<Edge> edges;
+
+    public HyderabadWaterNetwork() {
+        areas = new ArrayList<>();
+        edges = new ArrayList<>();
+    }
+
+    // Add an area to the network
+    public void addArea(String name) {
+        areas.add(new Area(name));
+    }
+
+    // Add a pipe (edge) between two areas with a weight ( or cost)
+    public void addPipe(String srcName, String destName, int weight) {
+        Area src = null, dest = null;
+        for (Area area : areas) {
+            if (area.name.equals(srcName))
+                src = area;
+            if (area.name.equals(destName))
+                dest = area;
+        }
+        if (src != null && dest != null) {
+            edges.add(new Edge(src, dest, weight));
+            edges.add(new Edge(dest, src, weight)); // Undirected graph
+        } else {
+            System.out.println("Error: Area not found!");
+        }
+    }
+
+    //Using Prim's algorithm to find MST
+    public int primMST() {
+        int totalCost = 0;
+        Set<Area> MSTSet = new HashSet<>();
+        PriorityQueue<Edge> pq = new PriorityQueue<>(Comparator.comparingInt(e -> e.weight)); //based on weeight
+
+        // Start from the first area (Any choice)
+        MSTSet.add(areas.get(0));
+
+        // Add all edges from the first area to the priority queue
+        for (Edge edge : edges) {
+            if (edge.src == areas.get(0))
+                pq.add(edge);
+        }
+
+        while (!pq.isEmpty()) {
+            Edge edge = pq.poll();
+
+            if (!MSTSet.contains(edge.dest)) {
+                MSTSet.add(edge.dest);
+                totalCost += edge.weight;
+
+                // Add all edges from the new area to the priority queue
+                for (Edge nextEdge : edges) {
+                    if (nextEdge.src == edge.dest && !MSTSet.contains(nextEdge.dest))
+                        pq.add(nextEdge);
+                }
+            }
+        }
+
+        return totalCost;
+    }
+}
+
+// Main class to run the program
+public class HyderabadWaterDistribution {
+    public static void main(String[] args) {
+        HyderabadWaterNetwork network = new HyderabadWaterNetwork();
+
+        // Add areas in Hyderabad
+        network.addArea("Ameerpet");
+        network.addArea("Banjara Hills");
+        network.addArea("Gachibowli");
+        network.addArea("Jubilee Hills");
+        network.addArea("Secunderabad");
+
+        // Add pipes with weights (costs)
+        network.addPipe("Ameerpet", "Banjara Hills", 5);
+        network.addPipe("Ameerpet", "Gachibowli", 8);
+        network.addPipe("Banjara Hills", "Gachibowli", 6);
+        network.addPipe("Banjara Hills", "Jubilee Hills", 3);
+        network.addPipe("Gachibowli", "Jubilee Hills", 7);
+        network.addPipe("Gachibowli", "Secunderabad", 9);
+        network.addPipe("Jubilee Hills", "Secunderabad", 4);
+
+        // Calculate MST using Prim's algorithm
+        int minCost = network.primMST();
+        System.out.println("Minimum Cost to build MST for Hyderabad Water Distribution Network: " + minCost);
+    }
+}
