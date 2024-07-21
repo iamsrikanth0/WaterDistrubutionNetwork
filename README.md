@@ -9,7 +9,7 @@ Prim's Algorithm Implementation:
    - Initialize with a starting area (node).
    - Use two sets: "MSTSet" (to store vertices included in MST) and "nonMSTSet" (to manage the priority queue for non-MST vertices).
    - Use a priority queue (min-heap) to always extend the MST with the cheapest edge.
-   - Maintain a `visited` array (boolean) to track included vertices.
+   - Maintain a "visited" array (boolean) to track included vertices.
 Steps:
    - Start with an arbitrary vertex (or chosen strategically based on requirements).
    - Add this vertex to the MSTSet and add its edges to the priority queue.
